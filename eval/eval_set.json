@@ -1,0 +1,427 @@
+{
+ "paper": "data/sample_paper.pdf",
+ "note": "Synthetic paper; facts verified against scripts/make_sample_paper.py. dev split = used to pick thresholds; test split = reported.",
+ "items": [
+  {
+   "id": "a01",
+   "question": "What fraction of the model's parameters does SGA train?",
+   "answerable": true,
+   "evidence": [
+    "trains 0.8% of the parameters"
+   ],
+   "must_include": [
+    [
+     "0.8%"
+    ]
+   ],
+   "split": "dev",
+   "type": "fact"
+  },
+  {
+   "id": "a02",
+   "question": "What bottleneck dimension do the adapters use?",
+   "answerable": true,
+   "evidence": [
+    "bottleneck dimension of r = 32"
+   ],
+   "must_include": [
+    [
+     "32"
+    ]
+   ],
+   "split": "test",
+   "type": "fact"
+  },
+  {
+   "id": "a03",
+   "question": "What average macro-F1 does SGA achieve?",
+   "answerable": true,
+   "evidence": [
+    "average macro-f1 of 80.0"
+   ],
+   "must_include": [
+    [
+     "80.0"
+    ]
+   ],
+   "split": "test",
+   "type": "fact"
+  },
+  {
+   "id": "a04",
+   "question": "By how many points does SGA improve over standard adapters?",
+   "answerable": true,
+   "evidence": [
+    "improves average macro-f1 by 3.1 points over standard adapters",
+    "3.1 points higher than standard adapters"
+   ],
+   "must_include": [
+    [
+     "3.1"
+    ]
+   ],
+   "split": "dev",
+   "type": "fact"
+  },
+  {
+   "id": "a05",
+   "question": "By what percentage does SGA cut training time?",
+   "answerable": true,
+   "evidence": [
+    "reduces training time by 27%"
+   ],
+   "must_include": [
+    [
+     "27%"
+    ]
+   ],
+   "split": "test",
+   "type": "fact"
+  },
+  {
+   "id": "a06",
+   "question": "Which datasets are used in the experiments?",
+   "answerable": true,
+   "evidence": [
+    "five text classification datasets: foodreviews"
+   ],
+   "must_include": [
+    [
+     "FoodReviews"
+    ],
+    [
+     "ForumToxicity"
+    ]
+   ],
+   "split": "test",
+   "type": "list"
+  },
+  {
+   "id": "a07",
+   "question": "Which optimizer and learning rate are used for the adapter methods?",
+   "answerable": true,
+   "evidence": [
+    "adamw optimizer"
+   ],
+   "must_include": [
+    [
+     "AdamW"
+    ],
+    [
+     "3e-4"
+    ]
+   ],
+   "split": "dev",
+   "type": "fact"
+  },
+  {
+   "id": "a08",
+   "question": "How many random seeds are the results averaged over?",
+   "answerable": true,
+   "evidence": [
+    "mean over 5 random seeds"
+   ],
+   "must_include": [
+    [
+     "5 random seeds",
+     "5 seeds",
+     "five seeds",
+     "five random seeds"
+    ]
+   ],
+   "split": "test",
+   "type": "fact"
+  },
+  {
+   "id": "a09",
+   "question": "How much GPU memory do the experiments need?",
+   "answerable": true,
+   "evidence": [
+    "single 24 gb gpu"
+   ],
+   "must_include": [
+    [
+     "24 gb",
+     "24gb"
+    ]
+   ],
+   "split": "test",
+   "type": "fact"
+  },
+  {
+   "id": "a10",
+   "question": "Which layers keep their adapters according to the learned gates?",
+   "answerable": true,
+   "evidence": [
+    "layers 7 to 12 retain"
+   ],
+   "must_include": [
+    [
+     "7 to 12",
+     "7-12",
+     "7–12"
+    ]
+   ],
+   "split": "dev",
+   "type": "fact"
+  },
+  {
+   "id": "a11",
+   "question": "What macro-F1 results when the L0 penalty is removed?",
+   "answerable": true,
+   "evidence": [
+    "without the l0 penalty yields 77.3"
+   ],
+   "must_include": [
+    [
+     "77.3"
+    ]
+   ],
+   "split": "test",
+   "type": "fact"
+  },
+  {
+   "id": "a12",
+   "question": "On which dataset is the improvement not statistically significant?",
+   "answerable": true,
+   "evidence": [
+    "not statistically significant on forumtoxicity"
+   ],
+   "must_include": [
+    [
+     "ForumToxicity"
+    ]
+   ],
+   "split": "test",
+   "type": "fact"
+  },
+  {
+   "id": "a13",
+   "question": "What is the inference latency overhead of SGA?",
+   "answerable": true,
+   "evidence": [
+    "by a factor of only 1.04"
+   ],
+   "must_include": [
+    [
+     "1.04"
+    ]
+   ],
+   "split": "dev",
+   "type": "fact"
+  },
+  {
+   "id": "a14",
+   "question": "How much does SGA gain with 100 labeled examples?",
+   "answerable": true,
+   "evidence": [
+    "68.2 macro-f1 versus 63.5"
+   ],
+   "must_include": [
+    [
+     "4.7",
+     "68.2"
+    ]
+   ],
+   "split": "test",
+   "type": "fact"
+  },
+  {
+   "id": "a15",
+   "question": "What sparsity coefficient is used for the L0 penalty?",
+   "answerable": true,
+   "evidence": [
+    "coefficient lambda = 0.01"
+   ],
+   "must_include": [
+    [
+     "0.01"
+    ]
+   ],
+   "split": "test",
+   "type": "fact"
+  },
+  {
+   "id": "a16",
+   "question": "Does the paper evaluate languages other than English?",
+   "answerable": true,
+   "evidence": [
+    "all datasets are in english",
+    "all experiments use english datasets"
+   ],
+   "must_include": [
+    [
+     "english"
+    ]
+   ],
+   "split": "dev",
+   "type": "yesno"
+  },
+  {
+   "id": "a17",
+   "question": "How much does the method help when very little labeled data is available?",
+   "answerable": true,
+   "evidence": [
+    "68.2 macro-f1 versus 63.5"
+   ],
+   "must_include": [
+    [
+     "4.7",
+     "68.2"
+    ]
+   ],
+   "split": "test",
+   "type": "paraphrase"
+  },
+  {
+   "id": "a18",
+   "question": "Why might these findings not hold for much larger models?",
+   "answerable": true,
+   "evidence": [
+    "single encoder with 110 million parameters"
+   ],
+   "must_include": [
+    [
+     "110 million"
+    ]
+   ],
+   "split": "test",
+   "type": "paraphrase"
+  },
+  {
+   "id": "a19",
+   "question": "When does training halt before the maximum number of epochs?",
+   "answerable": true,
+   "evidence": [
+    "stops early if validation macro-f1 does not improve for 3 consecutive epochs"
+   ],
+   "must_include": [
+    [
+     "3 consecutive",
+     "3 epochs",
+     "three"
+    ]
+   ],
+   "split": "dev",
+   "type": "paraphrase"
+  },
+  {
+   "id": "a20",
+   "question": "What macro-F1 does prompt tuning reach?",
+   "answerable": true,
+   "evidence": [
+    "71.2"
+   ],
+   "must_include": [
+    [
+     "71.2"
+    ]
+   ],
+   "split": "test",
+   "type": "table"
+  },
+  {
+   "id": "a21",
+   "question": "Which baselines does the paper compare against?",
+   "answerable": true,
+   "evidence": [
+    "four baselines: full fine-tuning"
+   ],
+   "must_include": [
+    [
+     "prompt tuning"
+    ],
+    [
+     "bias-only"
+    ]
+   ],
+   "split": "test",
+   "type": "list"
+  },
+  {
+   "id": "a22",
+   "question": "What makes the gates trainable?",
+   "answerable": true,
+   "evidence": [
+    "hard concrete"
+   ],
+   "must_include": [
+    [
+     "hard concrete"
+    ]
+   ],
+   "split": "dev",
+   "type": "fact"
+  },
+  {
+   "id": "a23",
+   "question": "What happens when lambda is set above 0.05?",
+   "answerable": true,
+   "evidence": [
+    "values above 0.05 removed almost all adapters"
+   ],
+   "must_include": [
+    [
+     "almost all adapters",
+     "removed"
+    ]
+   ],
+   "split": "test",
+   "type": "fact"
+  },
+  {
+   "id": "u01",
+   "question": "What was the carbon footprint of the experiments?",
+   "answerable": false,
+   "evidence": [],
+   "must_include": [],
+   "split": "dev",
+   "type": "absent"
+  },
+  {
+   "id": "u02",
+   "question": "Under what license is the code released?",
+   "answerable": false,
+   "evidence": [],
+   "must_include": [],
+   "split": "test",
+   "type": "absent"
+  },
+  {
+   "id": "u03",
+   "question": "What macro-F1 does LoRA achieve on FoodReviews?",
+   "answerable": false,
+   "evidence": [],
+   "must_include": [],
+   "split": "test",
+   "type": "in_topic"
+  },
+  {
+   "id": "u04",
+   "question": "Who funded this research?",
+   "answerable": false,
+   "evidence": [],
+   "must_include": [],
+   "split": "dev",
+   "type": "absent"
+  },
+  {
+   "id": "u05",
+   "question": "What accuracy does SGA reach on the MNLI dataset?",
+   "answerable": false,
+   "evidence": [],
+   "must_include": [],
+   "split": "test",
+   "type": "in_topic"
+  },
+  {
+   "id": "u06",
+   "question": "Did the authors run a human evaluation?",
+   "answerable": false,
+   "evidence": [],
+   "must_include": [],
+   "split": "test",
+   "type": "in_topic"
+  }
+ ]
+}

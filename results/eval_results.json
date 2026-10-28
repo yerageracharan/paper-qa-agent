@@ -1,0 +1,554 @@
+{
+ "backend": {
+  "embedder": "lsa",
+  "llm": "ExtractiveLLM",
+  "top_k": 5,
+  "chunks": 18
+ },
+ "retrieval": {
+  "bm25": {
+   "n": 23,
+   "hit@1": 73.9,
+   "hit@3": 91.3,
+   "hit@5": 95.7,
+   "mrr": 0.837
+  },
+  "dense": {
+   "n": 23,
+   "hit@1": 82.6,
+   "hit@3": 91.3,
+   "hit@5": 95.7,
+   "mrr": 0.88
+  },
+  "hybrid": {
+   "n": 23,
+   "hit@1": 82.6,
+   "hit@3": 91.3,
+   "hit@5": 95.7,
+   "mrr": 0.88
+  }
+ },
+ "end_to_end": {
+  "all": {
+   "split": "all",
+   "n_answerable": 23,
+   "n_unanswerable": 6,
+   "answer_accuracy": 82.6,
+   "false_abstain_rate": 13.0,
+   "abstain_recall_on_unanswerable": 66.7,
+   "wrong_answer_rate_when_answering": 5.0,
+   "citation_hit_rate": 95.0,
+   "overall_accuracy": 79.3,
+   "latency_ms_p50": 1.3,
+   "latency_ms_p95": 1.5
+  },
+  "dev": {
+   "split": "dev",
+   "n_answerable": 8,
+   "n_unanswerable": 2,
+   "answer_accuracy": 75.0,
+   "false_abstain_rate": 25.0,
+   "abstain_recall_on_unanswerable": 100.0,
+   "wrong_answer_rate_when_answering": 0.0,
+   "citation_hit_rate": 100.0,
+   "overall_accuracy": 80.0,
+   "latency_ms_p50": 1.26,
+   "latency_ms_p95": 1.58
+  },
+  "test": {
+   "split": "test",
+   "n_answerable": 15,
+   "n_unanswerable": 4,
+   "answer_accuracy": 86.7,
+   "false_abstain_rate": 6.7,
+   "abstain_recall_on_unanswerable": 50.0,
+   "wrong_answer_rate_when_answering": 7.1,
+   "citation_hit_rate": 92.9,
+   "overall_accuracy": 78.9,
+   "latency_ms_p50": 1.3,
+   "latency_ms_p95": 1.5
+  }
+ },
+ "by_type": {
+  "absent": {
+   "n": 3,
+   "accuracy": 100.0
+  },
+  "fact": {
+   "n": 16,
+   "accuracy": 100.0
+  },
+  "in_topic": {
+   "n": 3,
+   "accuracy": 33.3
+  },
+  "list": {
+   "n": 2,
+   "accuracy": 50.0
+  },
+  "paraphrase": {
+   "n": 3,
+   "accuracy": 33.3
+  },
+  "table": {
+   "n": 1,
+   "accuracy": 100.0
+  },
+  "yesno": {
+   "n": 1,
+   "accuracy": 0.0
+  }
+ },
+ "records": [
+  {
+   "id": "a01",
+   "split": "dev",
+   "type": "fact",
+   "answerable": true,
+   "question": "What fraction of the model's parameters does SGA train?",
+   "found": true,
+   "reason": null,
+   "answer": "In total, SGA trains 0.8% of the parameters of the base model, compared with 2.4% for standard adapters. [S1] On five low-resource text classification datasets with 500 labeled examples each, SGA improves average macro-F1 by 3.1 points over standard adapters while training only 0.8% of the model parameters. [S2]",
+   "latency_ms": 1.58,
+   "cited_sections": [
+    "3.3 Training Objective",
+    "Abstract"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a02",
+   "split": "test",
+   "type": "fact",
+   "answerable": true,
+   "question": "What bottleneck dimension do the adapters use?",
+   "found": true,
+   "reason": null,
+   "answer": "Each adapter is a bottleneck network that projects the hidden state of dimension 768 down to a bottleneck dimension of r = 32, applies a GELU nonlinearity, and projects back up to 768 dimensions. [S1] We compare against four baselines: full fine-tuning, standard adapters with a bottleneck dimension of 32 in every layer, prompt tuning, and bias-only tuning. [S2]",
+   "latency_ms": 1.28,
+   "cited_sections": [
+    "3.1 Adapter Architecture",
+    "4.2 Baselines"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a03",
+   "split": "test",
+   "type": "fact",
+   "answerable": true,
+   "question": "What average macro-F1 does SGA achieve?",
+   "found": true,
+   "reason": null,
+   "answer": "SGA reaches an average macro-F1 of 80.0, which is 3.1 points higher than standard adapters (76.9) and 1.6 points higher than full fine-tuning (78.4). [S1] On five low-resource text classification datasets with 500 labeled examples each, SGA improves average macro-F1 by 3.1 points over standard adapters while training only 0.8% of the model parameters. [S3]",
+   "latency_ms": 1.5,
+   "cited_sections": [
+    "5 Results",
+    "Abstract"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a04",
+   "split": "dev",
+   "type": "fact",
+   "answerable": true,
+   "question": "By how many points does SGA improve over standard adapters?",
+   "found": true,
+   "reason": null,
+   "answer": "On five low-resource text classification datasets with 500 labeled examples each, SGA improves average macro-F1 by 3.1 points over standard adapters while training only 0.8% of the model parameters. [S1]",
+   "latency_ms": 1.3,
+   "cited_sections": [
+    "Abstract"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a05",
+   "split": "test",
+   "type": "fact",
+   "answerable": true,
+   "question": "By what percentage does SGA cut training time?",
+   "found": true,
+   "reason": null,
+   "answer": "SGA also reduces training time by 27% and increases inference latency by a factor of only 1.04. [S1] SGA improves macro-F1 over standard adapters in low-resource classification while training fewer parameters and less time. [S2]",
+   "latency_ms": 1.39,
+   "cited_sections": [
+    "Abstract",
+    "8 Conclusion"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a06",
+   "split": "test",
+   "type": "list",
+   "answerable": true,
+   "question": "Which datasets are used in the experiments?",
+   "found": true,
+   "reason": null,
+   "answer": "All experiments use English datasets and a single encoder with 110 million parameters, so we cannot say whether the findings hold for multilingual or much larger models. [S1]",
+   "latency_ms": 1.46,
+   "cited_sections": [
+    "7 Limitations"
+   ],
+   "correct": false,
+   "citation_ok": false
+  },
+  {
+   "id": "a07",
+   "split": "dev",
+   "type": "fact",
+   "answerable": true,
+   "question": "Which optimizer and learning rate are used for the adapter methods?",
+   "found": true,
+   "reason": null,
+   "answer": "We train the adapter-based methods with the AdamW optimizer, a learning rate of 3e-4, and a batch size of 16 for up to 20 epochs; full fine-tuning uses a learning rate of 1e-5. [S1]",
+   "latency_ms": 1.35,
+   "cited_sections": [
+    "4.3 Implementation Details"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a08",
+   "split": "test",
+   "type": "fact",
+   "answerable": true,
+   "question": "How many random seeds are the results averaged over?",
+   "found": true,
+   "reason": null,
+   "answer": "We report the mean over 5 random seeds. [S1]",
+   "latency_ms": 1.3,
+   "cited_sections": [
+    "4.3 Implementation Details"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a09",
+   "split": "test",
+   "type": "fact",
+   "answerable": true,
+   "question": "How much GPU memory do the experiments need?",
+   "found": true,
+   "reason": null,
+   "answer": "All experiments run on a single 24 GB GPU. [S2]",
+   "latency_ms": 1.45,
+   "cited_sections": [
+    "4.3 Implementation Details"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a10",
+   "split": "dev",
+   "type": "fact",
+   "answerable": true,
+   "question": "Which layers keep their adapters according to the learned gates?",
+   "found": true,
+   "reason": null,
+   "answer": "The learned gates keep adapters in the upper layers: layers 7 to 12 retain an active gate in 82% of runs, while layers 1 to 6 retain one in only 19% of runs. [S1]",
+   "latency_ms": 1.16,
+   "cited_sections": [
+    "6.2 Which Layers Are Selected"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a11",
+   "split": "test",
+   "type": "fact",
+   "answerable": true,
+   "question": "What macro-F1 results when the L0 penalty is removed?",
+   "found": true,
+   "reason": null,
+   "answer": "Training the gates without the L0 penalty yields 77.3 macro-F1. [S1]",
+   "latency_ms": 1.25,
+   "cited_sections": [
+    "6.1 Ablations"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a12",
+   "split": "test",
+   "type": "fact",
+   "answerable": true,
+   "question": "On which dataset is the improvement not statistically significant?",
+   "found": true,
+   "reason": null,
+   "answer": "The improvement is not statistically significant on ForumToxicity (p = 0.12), where all adapter-based methods perform similarly. [S1]",
+   "latency_ms": 1.46,
+   "cited_sections": [
+    "5 Results"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a13",
+   "split": "dev",
+   "type": "fact",
+   "answerable": true,
+   "question": "What is the inference latency overhead of SGA?",
+   "found": true,
+   "reason": null,
+   "answer": "SGA also reduces training time by 27% and increases inference latency by a factor of only 1.04. [S1]",
+   "latency_ms": 1.27,
+   "cited_sections": [
+    "Abstract"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a14",
+   "split": "test",
+   "type": "fact",
+   "answerable": true,
+   "question": "How much does SGA gain with 100 labeled examples?",
+   "found": true,
+   "reason": null,
+   "answer": "With only 100 labeled examples, SGA reaches 68.2 macro-F1 versus 63.5 for standard adapters, a gain of 4.7 points. [S1]",
+   "latency_ms": 1.33,
+   "cited_sections": [
+    "6.3 Effect of Training Set Size"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a15",
+   "split": "test",
+   "type": "fact",
+   "answerable": true,
+   "question": "What sparsity coefficient is used for the L0 penalty?",
+   "found": true,
+   "reason": null,
+   "answer": "An L0 penalty with coefficient lambda = 0.01 encourages the expected number of active gates to be small. [S2]",
+   "latency_ms": 1.37,
+   "cited_sections": [
+    "3.2 Sparse Gating"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a16",
+   "split": "dev",
+   "type": "yesno",
+   "answerable": true,
+   "question": "Does the paper evaluate languages other than English?",
+   "found": false,
+   "reason": "model_not_found",
+   "answer": "I could not find an answer to this in the paper.",
+   "latency_ms": 1.25,
+   "cited_sections": [],
+   "correct": false,
+   "citation_ok": false
+  },
+  {
+   "id": "a17",
+   "split": "test",
+   "type": "paraphrase",
+   "answerable": true,
+   "question": "How much does the method help when very little labeled data is available?",
+   "found": false,
+   "reason": "model_not_found",
+   "answer": "I could not find an answer to this in the paper.",
+   "latency_ms": 1.15,
+   "cited_sections": [],
+   "correct": false,
+   "citation_ok": false
+  },
+  {
+   "id": "a18",
+   "split": "test",
+   "type": "paraphrase",
+   "answerable": true,
+   "question": "Why might these findings not hold for much larger models?",
+   "found": true,
+   "reason": null,
+   "answer": "All experiments use English datasets and a single encoder with 110 million parameters, so we cannot say whether the findings hold for multilingual or much larger models. [S1]",
+   "latency_ms": 1.3,
+   "cited_sections": [
+    "7 Limitations"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a19",
+   "split": "dev",
+   "type": "paraphrase",
+   "answerable": true,
+   "question": "When does training halt before the maximum number of epochs?",
+   "found": false,
+   "reason": "low_coverage",
+   "answer": "I could not find an answer to this in the paper.",
+   "latency_ms": 0.9,
+   "cited_sections": [],
+   "correct": false,
+   "citation_ok": false
+  },
+  {
+   "id": "a20",
+   "split": "test",
+   "type": "table",
+   "answerable": true,
+   "question": "What macro-F1 does prompt tuning reach?",
+   "found": true,
+   "reason": null,
+   "answer": "SGA reaches an average macro-F1 of 80.0, which is 3.1 points higher than standard adapters (76.9) and 1.6 points higher than full fine-tuning (78.4). [S3] Method Trainable params Avg. macro-F1 Full fine-tuning 100% 78.4 Standard adapters 2.4% 76.9 Prompt tuning 0.1% 71.2 Bias-only tuning 0.1% 73.5 SGA (ours) 0.8% 80.0 [S1]",
+   "latency_ms": 1.34,
+   "cited_sections": [
+    "5 Results",
+    "5 Results"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a21",
+   "split": "test",
+   "type": "list",
+   "answerable": true,
+   "question": "Which baselines does the paper compare against?",
+   "found": true,
+   "reason": null,
+   "answer": "We compare against four baselines: full fine-tuning, standard adapters with a bottleneck dimension of 32 in every layer, prompt tuning, and bias-only tuning. [S1]",
+   "latency_ms": 1.21,
+   "cited_sections": [
+    "4.2 Baselines"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a22",
+   "split": "dev",
+   "type": "fact",
+   "answerable": true,
+   "question": "What makes the gates trainable?",
+   "found": true,
+   "reason": null,
+   "answer": "Sparsity-inducing regularizers based on the L0 norm have been used for network pruning; we borrow the hard concrete relaxation from that literature to make the gates trainable. [S1]",
+   "latency_ms": 1.33,
+   "cited_sections": [
+    "2 Related Work"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "a23",
+   "split": "test",
+   "type": "fact",
+   "answerable": true,
+   "question": "What happens when lambda is set above 0.05?",
+   "found": true,
+   "reason": null,
+   "answer": "The method is sensitive to the sparsity coefficient lambda: values above 0.05 removed almost all adapters and degraded accuracy. [S1]",
+   "latency_ms": 1.27,
+   "cited_sections": [
+    "7 Limitations"
+   ],
+   "correct": true,
+   "citation_ok": true
+  },
+  {
+   "id": "u01",
+   "split": "dev",
+   "type": "absent",
+   "answerable": false,
+   "question": "What was the carbon footprint of the experiments?",
+   "found": false,
+   "reason": "low_coverage",
+   "answer": "I could not find an answer to this in the paper.",
+   "latency_ms": 0.98,
+   "cited_sections": [],
+   "correct": true
+  },
+  {
+   "id": "u02",
+   "split": "test",
+   "type": "absent",
+   "answerable": false,
+   "question": "Under what license is the code released?",
+   "found": false,
+   "reason": "low_coverage",
+   "answer": "I could not find an answer to this in the paper.",
+   "latency_ms": 0.62,
+   "cited_sections": [],
+   "correct": true
+  },
+  {
+   "id": "u03",
+   "split": "test",
+   "type": "in_topic",
+   "answerable": false,
+   "question": "What macro-F1 does LoRA achieve on FoodReviews?",
+   "found": false,
+   "reason": "model_not_found",
+   "answer": "I could not find an answer to this in the paper.",
+   "latency_ms": 1.1,
+   "cited_sections": [],
+   "correct": true
+  },
+  {
+   "id": "u04",
+   "split": "dev",
+   "type": "absent",
+   "answerable": false,
+   "question": "Who funded this research?",
+   "found": false,
+   "reason": "low_coverage",
+   "answer": "I could not find an answer to this in the paper.",
+   "latency_ms": 0.61,
+   "cited_sections": [],
+   "correct": true
+  },
+  {
+   "id": "u05",
+   "split": "test",
+   "type": "in_topic",
+   "answerable": false,
+   "question": "What accuracy does SGA reach on the MNLI dataset?",
+   "found": true,
+   "reason": null,
+   "answer": "SGA reaches an average macro-F1 of 80.0, which is 3.1 points higher than standard adapters (76.9) and 1.6 points higher than full fine-tuning (78.4). [S1] With only 100 labeled examples, SGA reaches 68.2 macro-F1 versus 63.5 for standard adapters, a gain of 4.7 points. [S2]",
+   "latency_ms": 1.41,
+   "cited_sections": [
+    "5 Results",
+    "6.3 Effect of Training Set Size"
+   ],
+   "correct": false
+  },
+  {
+   "id": "u06",
+   "split": "test",
+   "type": "in_topic",
+   "answerable": false,
+   "question": "Did the authors run a human evaluation?",
+   "found": true,
+   "reason": null,
+   "answer": "Future work includes multilingual evaluation and larger encoders. [S1]",
+   "latency_ms": 1.24,
+   "cited_sections": [
+    "8 Conclusion"
+   ],
+   "correct": false
+  }
+ ]
+}
