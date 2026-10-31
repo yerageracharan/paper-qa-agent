@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="t d"><title id="t">Paper Q and A workflow</title><desc id="d">A six-stage diagram from PDF upload to extracted pages, sections and chunks, hybrid search, evidence checks, and cited answer or abstention.</desc>
+<rect width="1200" height="360" rx="24" fill="#f5f0fb"/>
+<text x="50" y="55" font-family="Arial" font-size="25" font-weight="900" fill="#302144">THE QUEST: FROM PDF TO PROOF</text>
+<g font-family="Arial" text-anchor="middle">
+ <g transform="translate(38 112)"><rect width="150" height="145" rx="18" fill="#fff" stroke="#523777" stroke-width="4"/><text x="75" y="42" font-size="33">📄</text><text x="75" y="82" font-size="17" font-weight="800" fill="#302144">1. PDF</text><text x="75" y="108" font-size="12" fill="#68557f">Your paper</text></g>
+ <g transform="translate(238 112)"><rect width="150" height="145" rx="18" fill="#fff" stroke="#523777" stroke-width="4"/><text x="75" y="42" font-size="33">🧹</text><text x="75" y="82" font-size="17" font-weight="800" fill="#302144">2. CLEAN</text><text x="75" y="108" font-size="12" fill="#68557f">Extract + tidy text</text></g>
+ <g transform="translate(438 112)"><rect width="150" height="145" rx="18" fill="#fff" stroke="#523777" stroke-width="4"/><text x="75" y="42" font-size="33">🧩</text><text x="75" y="82" font-size="17" font-weight="800" fill="#302144">3. CHUNK</text><text x="75" y="108" font-size="12" fill="#68557f">Keep page + section</text></g>
+ <g transform="translate(638 112)"><rect width="150" height="145" rx="18" fill="#fff" stroke="#523777" stroke-width="4"/><text x="75" y="42" font-size="33">🔎</text><text x="75" y="82" font-size="17" font-weight="800" fill="#302144">4. SEARCH</text><text x="75" y="108" font-size="12" fill="#68557f">BM25 + embeddings</text></g>
+ <g transform="translate(838 112)"><rect width="150" height="145" rx="18" fill="#fff" stroke="#523777" stroke-width="4"/><text x="75" y="42" font-size="33">🛡️</text><text x="75" y="82" font-size="17" font-weight="800" fill="#302144">5. VERIFY</text><text x="75" y="108" font-size="12" fill="#68557f">Coverage + citations</text></g>
+ <g transform="translate(1038 112)"><rect width="125" height="145" rx="18" fill="#ffe69a" stroke="#523777" stroke-width="4"/><text x="62" y="42" font-size="33">💬</text><text x="62" y="82" font-size="17" font-weight="800" fill="#302144">6. RESULT</text><text x="62" y="108" font-size="12" fill="#68557f">Answer / refuse</text></g>
+</g>
+<g stroke="#8f70b6" stroke-width="6" stroke-linecap="round" fill="none"><path d="M192 184h37m-12 -12l12 12 -12 12M392 184h37m-12 -12l12 12 -12 12M592 184h37m-12 -12l12 12 -12 12M792 184h37m-12 -12l12 12 -12 12M992 184h37m-12 -12l12 12 -12 12"/></g>
+<text x="600" y="315" text-anchor="middle" font-family="Arial" font-size="15" fill="#655274">A good answer earns its citation. A weak evidence trail triggers an honest refusal.</text>
+</svg>
