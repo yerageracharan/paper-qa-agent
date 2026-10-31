@@ -1,423 +1,568 @@
 # Paper Q&A Agent
 
-![Paper Q&A Agent — dark anime-style project banner](assets/hero-banner.jpg)
+<p align="center">
+  <img src="assets/hero.svg" alt="Paper Q&A Agent — ask your PDF and get answers with evidence" width="100%" />
+</p>
 
-**Turn a research paper into a conversation.** Drop in a text-based PDF, ask a question in normal English, and get an answer that points back to the paper. If the agent cannot find enough evidence, it can say so instead of confidently making something up.
+<p align="center">
+  <strong>Your research-paper sidekick. It reads one PDF, searches for evidence, and gives you an answer with a section, page, and supporting passage — or admits when it cannot find the answer.</strong>
+</p>
 
-> **The idea:** read less blindly, verify more quickly, and spend your time understanding the ideas—not hunting through 30 pages for one sentence.
+<p align="center">
+  <img alt="Python 3.10–3.13 CI" src="https://img.shields.io/badge/Python-3.10%E2%80%933.13-3776AB?logo=python&logoColor=white" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-31%20in%20project-6f42c1" />
+  <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-2ea44f" />
+  <img alt="Interface CLI and Streamlit" src="https://img.shields.io/badge/interface-CLI%20%2B%20Streamlit-ff4b4b" />
+</p>
 
-## The 20-second explanation
-
-Imagine a research paper is a giant textbook and you only need to know three things. Instead of reading every page, you ask:
-
-- “What problem is this paper trying to solve?”
-- “What did the authors find?”
-- “Which page supports that claim?”
-
-Paper Q&A Agent searches the PDF, finds passages that look relevant, and builds an answer from those passages. It also tracks where the passages came from, so you can check the source yourself.
-
-It is **not** a magical all-knowing chatbot. It is a document-question-answering tool with checks designed to make its answers easier to verify.
-
-## Table of contents
-
-- [The 20-second explanation](#the-20-second-explanation)
-- [What it can do](#what-it-can-do)
-- [See what an answer looks like](#see-what-an-answer-looks-like)
-- [How it works](#how-it-works--no-phd-required)
-- [How the agent tries not to make things up](#how-the-agent-tries-not-to-make-things-up)
-- [Get started](#get-started)
-- [Offline mode and optional AI add-ons](#offline-mode-vs-optional-ai-add-ons)
-- [Measured results](#results-what-has-actually-been-measured)
-- [Project structure](#what-is-inside-the-project)
-- [Limitations](#limitations--please-read-this-before-relying-on-it)
-- [Troubleshooting](#troubleshooting)
-- [Future improvements](#ideas-for-future-improvements)
-
-## What it can do
-
-| Feature | In normal human language |
-|---|---|
-| Read a PDF | Extracts text, sections, and page information from a text-based research paper. |
-| Search for evidence | Finds passages that may answer your question. |
-| Answer a question | Uses the selected passages to produce an answer. The default offline mode extracts relevant text; an optional Claude backend can generate answers. |
-| Show its sources | Adds citations such as `[S1]`, with the section and page, so you can inspect the evidence. |
-| Admit when it is stuck | Can refuse to answer when the evidence is weak or a required check fails. |
-| Run on your machine | The default offline mode needs no paid API key and does not need to call an online LLM. |
-| Offer a web interface | A small Streamlit app lets you upload a PDF and ask questions in a browser. |
-| Evaluate itself | Runs a small set of known questions and writes a report so results can be inspected. |
-
-## See what an answer looks like
-
-![Distinct demo panels showing a cited answer and a refusal when the paper does not contain the answer](assets/demo-proof.jpg)
-
-### Example 1: the paper contains the answer
-
-Run this from the project folder:
-
-```bash
-python -m paperqa ask data/sample_paper.pdf "Which layers keep their adapters according to the learned gates?"
-```
-
-Example output, shortened for readability:
-
-```text
-The learned gates keep adapters in the upper layers: layers 7 to 12
-retain an active gate in 82% of runs, ... [S1]
-
-[S1] Section 6.2 Which Layers Are Selected (p. 3):
-"The learned gates keep adapters in the upper layers: ..."
-```
-
-The important part is not just the answer. It is the **section, page, and supporting passage** that let you check it.
-
-### Example 2: the paper does not contain the answer
-
-```bash
-python -m paperqa ask data/sample_paper.pdf "What was the carbon footprint of the experiments?"
-```
-
-Example output:
-
-```text
-I could not find an answer to this in the paper.
-
-(reason: low_coverage; coverage 0.22)
-```
-
-That response is useful. It tells you the agent did not find enough matching evidence. It does **not** prove that the experiments had no carbon footprint; it means the paper, as processed by the tool, did not provide enough evidence for an answer.
+> **Your starting point:** this guide is published alongside the complete project repository. The repository contains the Python package, Streamlit app, sample PDF, tests, evaluation files, and project configuration. Clone the repository before following the setup steps; downloading this README by itself is not enough to run the agent.
 
 ---
 
-## How it works — no PhD required
+## 0. Welcome, rookie researcher! 🎒
 
-![A visual walkthrough of the paper-to-answer workflow](assets/workflow-map.jpg)
+Ever opened a 30-page research paper, stared at a wall of academic vocabulary, and thought:
 
-Think of it as a research assistant with a strict checklist:
+**“WHERE IS THE ONE PARAGRAPH THAT ANSWERS MY QUESTION?!”**
 
-1. **Open the PDF.** Extract the readable text and keep track of pages and section headings.
-2. **Tidy the text.** Remove some repeated page furniture, such as headers and footers, then split the paper into smaller chunks around sentence boundaries.
-3. **Find useful chunks.** Search for sections that may contain the answer. The search combines word matching with a second ranking method when appropriate.
-4. **Draft an answer.** The default offline answerer picks relevant source text. An optional LLM backend can be used to produce a more natural answer from the retrieved excerpts.
-5. **Check the answer.** Look for evidence that the answer is supported, that it has a citation, and that any numbers appear in the cited source.
-6. **Return the result.** Give the answer with a citation—or return a refusal with a reason when a check fails.
+That is the boss fight this project is trying to make less painful.
 
-### Tiny glossary
+**Paper Q&A Agent** is a document-question-answering project. Give it a text-based research-paper PDF, ask a question, and it searches the paper for relevant passages. When it answers, it is designed to attach a source marker such as `[S1]`, with the section, page, and supporting quote. When the evidence is too weak or missing, it can abstain instead of confidently inventing an answer.
 
-| Project term | Translation |
-|---|---|
-| **Chunk** | A small piece of the paper. Searching 120-word pieces is easier than searching an entire document as one giant block. |
-| **Embedding** | A numerical representation of text that can help find similar meanings, not just identical words. |
-| **BM25** | A search method that is good at matching important words and phrases. |
-| **Hybrid search** | Combining different search rankings in the hope of finding better evidence. |
-| **Citation** | A pointer back to the section and page that support an answer. |
-| **Abstain** | Refuse to answer because the available evidence is not good enough. |
-| **Evaluation** | Asking a set of known questions to measure how the tool behaves. |
-| **Hallucination** | A claim that sounds plausible but is not supported by the source. |
+Think of it as a tiny research assistant with one very important rule:
 
-## How the agent tries not to make things up
+> **No evidence, no victory speech.**
 
-![A separate visual panel about retrieval, evidence, and answer checks](assets/guardrails.jpg)
+### What this project does
 
-No software check is perfect, but this project uses several checks instead of trusting one signal:
+- Reads the text from a PDF.
+- Cleans extracted text and divides it into section-aware chunks while keeping page information.
+- Searches using a hybrid of BM25 keyword retrieval and embeddings, fused with Reciprocal Rank Fusion (RRF).
+- Uses a coverage gate before answering.
+- Returns answers with source citations, or a machine-readable refusal reason.
+- Offers a command-line interface and a Streamlit web interface.
+- Includes an evaluation harness and a test suite, according to the supplied project README.
 
-### 1. Evidence coverage check
+### What it does not promise
 
-Before answering, the agent looks at how much of the important wording in your question appears in the retrieved passages. If too little is present, it can stop early. For example, asking about a “carbon footprint” should not succeed just because the paper contains the word “experiments.”
-
-### 2. The answerer can refuse
-
-The optional Claude answerer is instructed to return `NOT_FOUND` when its supplied excerpts do not support an answer. The offline extractive answerer also has its own rule for refusing when it cannot find a sentence that matches enough of the question.
-
-### 3. A valid citation is required
-
-An answer without a valid `[S#]` citation can be rejected. A citation makes the answer checkable; it is not a guarantee that the interpretation is correct.
-
-### 4. Number check
-
-The tool checks that numbers in an answer appear in the cited passage. This helps catch made-up statistics, but it has a trade-off: a mathematically valid number calculated from source values may be rejected if that new number does not appear verbatim in the source.
-
-### Refusal reasons you might see
-
-| Reason | What it means |
-|---|---|
-| `low_coverage` | The retrieved text does not cover enough of the question's important terms. |
-| `model_not_found` | The answerer could not find an answer in the supplied passages. |
-| `no_valid_citation` | The answer did not include a valid source citation. |
-| `unsupported_number` | A number in the answer could not be verified in the cited text. |
-
-**Important:** these checks reduce some kinds of unsupported answers; they do not make the agent infallible. Always open the cited passage before relying on an important claim.
+- It does not understand every PDF layout perfectly.
+- It does not perform OCR on scanned PDFs.
+- It does not guarantee that every answer is correct just because a citation is present.
+- It is designed for one document at a time, not cross-paper research across a library.
 
 ---
 
-## Get started
+## 1. See the mission before installing anything 🗺️
 
-The commands below assume the project's source files are present and that you are running commands from the project root—the folder containing `pyproject.toml`.
+<p align="center">
+  <img src="assets/workflow.svg" alt="Workflow from PDF extraction through retrieval and verification to a cited answer or refusal" width="100%" />
+</p>
 
-### Before you start
+The flow is:
 
-- Install **Python 3.10–3.13**. The project notes say CI checks those versions; local testing was performed on Python 3.13.
-- Download or clone the project from its GitHub repository, then open a terminal in the project folder.
-- The standard setup uses the offline backend. You do not need an Anthropic API key for the basic commands below.
+1. **PDF enters the arena.** The project extracts text from the document.
+2. **Text gets cleaned.** Headers and page-number noise are removed where possible.
+3. **The paper is divided into chunks.** Sentence-aware chunks retain section and page information.
+4. **The search system hunts for evidence.** BM25 and embeddings contribute rankings; RRF combines them.
+5. **The answer is challenged.** Coverage, citation, and number checks help reject unsupported output.
+6. **The result appears.** You get an answer with citations, or an abstention reason.
 
-Python download: <https://www.python.org/downloads/>
+### Project vocabulary, translated into human
 
-### Step 1 — Create a virtual environment
+| Project term | Plain-English meaning |
+|---|---|
+| **PDF extraction** | Turning a PDF's selectable text into text the program can process. |
+| **Chunk** | A small passage of the paper that can be retrieved as evidence. |
+| **BM25** | A keyword-search ranking method. Useful when the question shares exact terms with the paper. |
+| **Embedding** | A numerical representation of text used to compare meaning-related passages. |
+| **Hybrid retrieval** | Combining keyword and embedding search rather than relying on only one. |
+| **RRF** | Reciprocal Rank Fusion — a way to combine ranked result lists. |
+| **Coverage gate** | A check that asks whether the retrieved text covers enough of the question. |
+| **Abstention** | The agent declines to answer because it cannot find enough support. |
+| **Citation hit** | The cited chunk contains the evidence expected for the evaluation question. |
 
-A virtual environment keeps this project's Python packages separate from other Python projects on your computer.
+---
 
-**Windows PowerShell:**
+## 2. Before the first summon: what you need 🧰
+
+| Requirement | What to prepare |
+|---|---|
+| Python | Python **3.10–3.13** is the CI range stated in the project README. The supplied README reports local testing on Python 3.13. |
+| Terminal | PowerShell on Windows, or Terminal on macOS/Linux. |
+| Project files | The full repository/source folder — not just this README. |
+| PDF | A text-based PDF. A scanned image-only PDF is not supported by the documented extraction path. |
+| API key | **Not needed** for the offline baseline. An Anthropic key is optional for the Claude answerer. |
+| Internet | Needed to install packages. The offline baseline does not need a hosted LLM API key once dependencies are installed. |
+
+### Check that Python is installed
+
+Open a terminal and run:
+
+**Windows (PowerShell):**
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+py --version
 ```
 
 **macOS / Linux:**
 
 ```bash
-python -m venv .venv
+python3 --version
+```
+
+The project README says CI covers Python 3.10 to 3.13, while the local environment used for its reported run was Python 3.13. If you have several Python versions installed, use Python 3.13 for the closest match to that local run.
+
+---
+
+## 3. Install it — step by step, no speed-running 🏃
+
+First, download or clone the **complete project repository** and open a terminal in its root folder. The root folder should contain `pyproject.toml`, `app.py`, and the `paperqa/` directory.
+
+### Step 1 — Create a virtual environment
+
+A virtual environment keeps this project's Python packages separate from other projects. Think of it as giving this agent its own little training room.
+
+**Windows (PowerShell):**
+
+```powershell
+py -3.13 -m venv .venv
+```
+
+**macOS / Linux:**
+
+```bash
+python3 -m venv .venv
+```
+
+### Step 2 — Activate the environment
+
+**Windows (PowerShell):**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+**Windows (Command Prompt):**
+
+```bat
+.venv\Scripts\activate.bat
+```
+
+**macOS / Linux:**
+
+```bash
 source .venv/bin/activate
 ```
 
-If the activation command is unfamiliar, that is normal. It simply switches your terminal into this project's isolated Python environment.
+When it is active, your terminal prompt commonly shows `(.venv)` at the beginning.
 
-### Step 2 — Install the project
-
-Run this in the project root:
+### Step 3 — Upgrade pip
 
 ```bash
-python -m pip install -e ".[dev,ui]"
+python -m pip install --upgrade pip
 ```
 
-This installs the project plus the development/test tools and the web interface dependencies.
+### Step 4 — Install the project and its development/UI tools
 
-### Step 3 — Run the tests (recommended)
+```bash
+pip install -e ".[dev,ui]"
+```
+
+This is the documented install command for the core project, development dependencies such as pytest, and the Streamlit interface.
+
+### Step 5 — Run the test suite
 
 ```bash
 python -m pytest -q
 ```
 
-The project includes **31 tests** covering areas such as PDF ingestion, search, agent behaviour, LLM behaviour, evaluation metrics, and the UI. The project notes report that the tests do not need a network connection or API key.
+The supplied project README reports **31 tests** and an approximate run time of two seconds, without a network connection or API key. That is the project's reported result, not a test run performed while preparing this README.
 
-### Step 4 — Ask your first question
+### Step 6 — Ask your first question
 
 ```bash
 python -m paperqa ask data/sample_paper.pdf "What bottleneck dimension do the adapters use?"
 ```
 
-Try your own question by replacing the text inside quotation marks. Use the included sample PDF first so you can check that the basic setup works before testing your own document.
+The sample PDF is described by the project README as a synthetic paper generated by `scripts/make_sample_paper.py`.
 
-### Step 5 — Open the web interface (optional)
+### Step 7 — Launch the visual interface
 
 ```bash
 streamlit run app.py
 ```
 
-Streamlit will show a local web address in your terminal. Open that address in your browser, upload a **text-based PDF**, and ask a question.
+Streamlit starts a local web app. Open the local address printed in the terminal. The documented interface supports uploading a text-based PDF.
 
-### Step 6 — Run the evaluation (optional)
-
-```bash
-python -m paperqa eval data/sample_paper.pdf
-```
-
-The evaluation writes a Markdown report and a JSON file under `results/`, according to the project's current configuration. The report makes it easier to inspect which questions were answered correctly or incorrectly.
+<p align="center">
+  <img src="assets/use-cases.svg" alt="Four example research tasks: method check, result hunt, section finder, and asking about a fact absent from the paper" width="100%" />
+</p>
 
 ---
 
-## Offline mode vs. optional AI add-ons
+## 4. Your first research mission 🎯
 
-You can try the basic project without configuring a hosted LLM. There are optional backends for people who want to experiment with stronger language models or semantic search.
+The supplied project README includes these example questions and outcomes. Use them to understand the intended behaviour.
 
-| Option | What it changes | What you need to know |
-|---|---|---|
-| **Offline default** | Uses LSA for its default text representation and an extractive answerer. | Free to run locally and needs no API key. It is deliberately a baseline, not a state-of-the-art semantic search system. |
-| **Claude answerer** | Uses Anthropic's model to generate an answer from retrieved passages. | Requires the optional package and your own `ANTHROPIC_API_KEY`. API calls may cost money. |
-| **Sentence-transformers embedder** | Adds a neural embedding model for more capable semantic retrieval. | Requires installing the optional package and downloading a model. It is not the zero-download default. |
-
-### Optional: install the Claude backend
+### Mission A — Ask about a fact that appears in the paper
 
 ```bash
-python -m pip install -e ".[llm]"
+python -m paperqa ask data/sample_paper.pdf "Which layers keep their adapters according to the learned gates?"
 ```
 
-Then provide an API key in the terminal session where you will run the project.
+Example output format from the supplied README:
 
-**Windows PowerShell:**
+```text
+The learned gates keep adapters in the upper layers: layers 7 to 12 retain an active gate in 82% of runs, ... [S1]
 
-```powershell
-$env:ANTHROPIC_API_KEY = "your-api-key"
+[S1] Section 6.2 Which Layers Are Selected (p. 3):
+     "The learned gates keep adapters in the upper layers: ..."
 ```
 
-**macOS / Linux:**
+**How to read this:**
+
+- The answer contains a source marker: `[S1]`.
+- `[S1]` points to a retrieved source passage.
+- The citation names **Section 6.2** and **page 3**.
+- A supporting quotation is shown below the answer.
+
+<p align="center">
+  <img src="assets/citation-card.svg" alt="Illustration of an answer with a source marker, section, page, and supporting quote" width="100%" />
+</p>
+
+### Mission B — Ask about something the paper does not report
 
 ```bash
-export ANTHROPIC_API_KEY="your-api-key"
+python -m paperqa ask data/sample_paper.pdf "What was the carbon footprint of the experiments?"
 ```
 
-Do not paste your real key into the README, commit it to GitHub, or share it in screenshots. Keep it private.
+Example output from the supplied README:
 
-The project README documents this example for evaluating with Claude:
+```text
+I could not find an answer to this in the paper.
+(reason: low_coverage; coverage 0.22)
+```
+
+That is not a crash. It is an intentional refusal. The retrieval coverage was low, so the agent did not proceed as though it had evidence.
+
+### Mission C — Explore the other CLI commands
+
+The supplied project README lists these CLI modes:
+
+- `ask` — ask a question about a PDF.
+- `chat` — interactive question-and-answer mode.
+- `chunks` — inspect the document chunks.
+- `eval` — evaluate the system against a question set.
+
+For the exact arguments supported by your checked-out version, use the built-in help:
 
 ```bash
-python -m paperqa eval data/sample_paper.pdf --llm anthropic --out results_claude
+python -m paperqa --help
+python -m paperqa ask --help
 ```
 
-### Optional: install sentence-transformers embeddings
+---
+
+## 5. How does it avoid making stuff up? 🛡️
+
+The design uses multiple checks. None is magic, and none proves that every response is correct, but together they make unsupported answers easier to catch.
+
+<p align="center">
+  <img src="assets/abstention.svg" alt="Four checks: retrieval coverage, answerer refusal, citation validation, and number guard" width="100%" />
+</p>
+
+### The four checks
+
+1. **Coverage gate** — calculates the IDF-weighted share of question content terms found in retrieved passages. Terms that never occur in the paper receive high weight. Below the configured threshold, the system abstains before calling the LLM.
+2. **Answerer refusal** — the Claude answerer is instructed to return `NOT_FOUND` when the excerpts do not contain the answer. The extractive answerer also has a refusal condition based on question-term coverage.
+3. **Citation validation** — an answer without a valid `[S#]` citation is rejected.
+4. **Number guard** — every number in an answer must appear in the cited passages. This can catch unsupported figures, but it can also reject a legitimate newly calculated number.
+
+### Refusal reasons
+
+| Reason | Meaning in the documented design |
+|---|---|
+| `low_coverage` | Retrieved passages do not cover enough of the question. |
+| `model_not_found` | The answerer says the evidence does not contain the answer. |
+| `no_valid_citation` | The generated answer does not contain a valid source citation. |
+| `unsupported_number` | A number in the answer does not appear in the cited passage. |
+
+**Important:** a citation is a trail to inspect, not a guarantee. Open the cited passage and check that it really supports the claim before using an answer in academic work.
+
+---
+
+## 6. Optional power-ups: real models ⚡
+
+The project has an offline baseline and optional backends.
+
+### Option A — Stay with the offline baseline
+
+This is the easiest starting point. The documented default uses:
+
+- **LSA embeddings** — a lightweight offline representation learned from the paper's text.
+- **Extractive answerer** — selects a relevant sentence rather than generating a free-form answer.
+
+The baseline needs no paid API key. The supplied README warns that LSA trained on a single three-page sample paper is not equivalent to a modern neural embedding model.
+
+### Option B — Add sentence-transformers embeddings
+
+Install the optional embedding dependencies:
 
 ```bash
-python -m pip install -e ".[embeddings]"
+pip install -e ".[embeddings]"
 ```
 
-The model needs to be downloaded. The project README documents this evaluation command for using sentence-transformers embeddings with the offline answerer:
+Then run an evaluation using the sentence-transformers embedder and the extractive answerer:
 
 ```bash
 python -m paperqa eval data/sample_paper.pdf --embedder st --llm extractive --out results_st
 ```
 
-### A note about measured results
+The README describes this as a way to isolate the retrieval effect while keeping the answerer extractive.
 
-The Claude answerer and sentence-transformers embedder are described as implemented and unit-tested against fakes, but **they were not evaluated in the environment used to produce the original project results**. The reported scores below come from the offline LSA + extractive setup. Do not treat the offline results as evidence that the optional backends achieve the same scores—or better scores—until you run their evaluations.
+### Option C — Use the Anthropic / Claude answerer
+
+Install the optional LLM dependency:
+
+```bash
+pip install -e ".[llm]"
+```
+
+Set your API key as an environment variable. **Never paste a real API key into a README, source file, screenshot, or public GitHub commit.**
+
+**Windows (PowerShell):**
+
+```powershell
+$env:ANTHROPIC_API_KEY = "your-key-here"
+```
+
+**macOS / Linux:**
+
+```bash
+export ANTHROPIC_API_KEY="your-key-here"
+```
+
+Run the Claude evaluation:
+
+```bash
+python -m paperqa eval data/sample_paper.pdf --llm anthropic --out results_claude
+```
+
+The supplied README identifies the default configured model as `claude-sonnet-5-5`. The model name is controlled by project configuration; check the current configuration and the provider's model availability before running.
+
+### Which setup should a beginner choose?
+
+| Your goal | Start with |
+|---|---|
+| Just run the project and understand the pipeline | Offline baseline |
+| Experiment with semantic retrieval | `--embedder st --llm extractive` |
+| Evaluate a hosted answerer | `--llm anthropic` with your own API key |
 
 ---
 
-## Results: what has actually been measured?
+## 7. Evaluation: does it actually work? 📈
 
-The project was evaluated on **29 questions about one synthetic, three-page paper**: 23 questions had answers in the paper, and 6 did not. The reported setup used the LSA embedder, the extractive answerer, `top_k=5`, and 18 chunks.
+The supplied project README reports an evaluation on **29 questions** about **one synthetic paper**: 23 answerable questions and 6 unanswerable questions. The questions are divided into a development split (10 questions) and a test split (19 questions).
+
+> **Read the fine print:** these are small-sample, offline-baseline results. They are useful as a reproducible starting point, not as proof that the system performs equally well on real research papers. The uploaded README says the Claude answerer and sentence-transformers embedder were implemented and unit-tested against fakes, but were **not evaluated** in that build environment because no API key or Hugging Face model-hub access was available.
+
+### Retrieval results
+
+| Retrieval mode | Hit@1 | Hit@3 | Hit@5 | MRR |
+|---|---:|---:|---:|---:|
+| BM25 only | 73.9% | 91.3% | 95.7% | 0.837 |
+| Dense (LSA) only | 82.6% | 91.3% | 95.7% | 0.880 |
+| Hybrid (RRF) | 82.6% | 91.3% | 95.7% | 0.880 |
 
 ### End-to-end results
 
-| Split | Answer accuracy | False-abstain rate | Correctly refused unanswerable questions | Wrong answers among produced answers | Citation hit |
+| Split | Answer accuracy | False-abstain | Abstain recall | Wrong when answering | Citation hit |
 |---|---:|---:|---:|---:|---:|
-| Development (10 questions) | 75.0% | 25.0% | 100% | 0.0% | 100% |
-| Test (19 questions) | 86.7% | 6.7% | 50.0% | 7.1% | 92.9% |
-| All (29 questions) | 82.6% | 13.0% | 66.7% | 5.0% | 95.0% |
+| Dev (8 answerable / 2 unanswerable) | 75.0% | 25.0% | 100% | 0.0% | 100% |
+| **Test (15 / 4)** | **86.7%** | 6.7% | **50.0%** | 7.1% | 92.9% |
+| All (23 / 6) | 82.6% | 13.0% | 66.7% | 5.0% | 95.0% |
 
-### Search results
+### What those numbers are saying
 
-For answerable questions, a retrieval hit means a returned chunk contained the expected evidence text.
+- The strongest documented weakness is **in-topic but unanswerable questions**. On the test split, abstain recall was 50%. The offline extractive answerer sometimes selected a nearby sentence that mentioned a related concept without answering the actual question.
+- Hybrid retrieval did **not** outperform dense LSA retrieval on this tiny dataset. The project README explicitly says this is not evidence for or against hybrid retrieval on larger, real papers.
+- Paraphrase questions were difficult for the offline baseline because it does not use a modern neural semantic model.
+- One test question changes a percentage by about 6.7 points, so the test set is small.
 
-| Search method | Hit@1 | Hit@3 | Hit@5 | MRR |
-|---|---:|---:|---:|---:|
-| BM25 word search | 73.9% | 91.3% | 95.7% | 0.837 |
-| Dense search with offline LSA | 82.6% | 91.3% | 95.7% | 0.880 |
-| Hybrid search (rank fusion) | 82.6% | 91.3% | 95.7% | 0.880 |
-
-### How to interpret those numbers
-
-- **They are a baseline, not a leaderboard score.** There is only one small synthetic paper and 29 questions.
-- **The main weakness was knowing when not to answer.** On the test split, the agent correctly refused only 50% of the unanswerable questions. It sometimes confused “the paper mentions evaluation” with “the paper reports a human evaluation.”
-- **Hybrid search did not beat dense search in this small experiment.** That does not prove it will never help; this test is too small to make a broad claim.
-- **Paraphrases can be difficult for the offline setup.** The default LSA representation is not a modern neural semantic model, so different wording can hide a relevant passage.
-- **The test split is tiny.** One question changes a percentage noticeably. Results on real papers may be very different.
-
-The offline retrieval-and-answer pipeline was reported at a median of about **1.3 ms per question** and a 95th-percentile of about **1.5 ms**, excluding index construction. Building the index for the sample paper took about **1.2 seconds**. Those timings are for the small offline test setup, not for a hosted LLM; Claude latency and cost were not measured.
-
-## What is inside the project?
-
-The source project is organized into small pieces so each part has one main job.
-
-```text
-paperqa/
-├── ingest.py      # Read and clean PDF text; find sections and pages
-├── index.py       # Build the searchable index and rank passages
-├── llm.py         # Offline answerer and optional Anthropic answerer
-├── agent.py       # Coordinate search, checks, citations, and answers
-├── evaluate.py    # Run the evaluation and create reports
-├── cli.py         # Commands you run from the terminal
-├── text.py        # Text-processing helpers
-└── config.py      # Configuration
-
-app.py             # Browser-based Streamlit interface
-eval/              # Questions used to test the agent
-data/              # Synthetic sample paper
-tests/              # Automated tests
-results/            # Evaluation reports
-docs/demo.md        # Example terminal session
-LEARNINGS.md        # Known problems and lessons from the evaluation
-pyproject.toml      # Python package configuration
-```
-
-Some filenames and folder names may appear slightly differently if the project is changed later; the list above describes the layout documented for this version.
-
-## Limitations — please read this before relying on it
-
-![Visual reminder of the project’s limitations and intended users](assets/limitations-reminder.jpg)
-
-This project is useful for experimenting with grounded document Q&A, but it has real limitations:
-
-- **Scanned PDFs are not supported by OCR.** If a PDF is just photographs of pages, text extraction may return little or nothing.
-- **Complex layouts can confuse extraction.** Two-column papers, equations, and tables may be read in the wrong order or flattened into text that loses its structure.
-- **It handles one document at a time.** It does not currently search across a whole library of papers.
-- **References are excluded from search.** That helps avoid bibliography noise, but it means the agent cannot reliably answer questions such as “Who wrote reference 2?”
-- **Citations identify a chunk, section, and page.** They do not point to an exact character range in the PDF.
-- **The evaluation's answer checking is simple.** It checks expected text, which can unfairly mark a correct paraphrase wrong or miss subtleties a human reviewer would notice.
-- **The example paper is synthetic.** The scores do not demonstrate performance on real research papers.
-- **A citation is not proof that an interpretation is right.** Open the cited passage and check whether it really supports the claim.
-
-For medical, legal, financial, or other high-stakes research, treat the agent as a navigation aid—not as a substitute for checking the original paper or getting appropriate expert review.
-
-## Troubleshooting
-
-### `No module named paperqa`
-
-Make sure you are in the project root (the folder containing `pyproject.toml`), have activated the intended virtual environment, and ran:
+### Run the evaluation yourself
 
 ```bash
-python -m pip install -e ".[dev,ui]"
+python -m paperqa eval data/sample_paper.pdf
 ```
 
-### `python` is not found
-
-Install Python from <https://www.python.org/downloads/>. On some Windows computers, the command `py` works instead of `python`; if so, use `py -m venv .venv` to create the environment and keep using the Python command associated with that environment.
-
-### The web interface command is not found
-
-Confirm the optional UI dependencies were installed. You can also try launching Streamlit through the active Python environment:
-
-```bash
-python -m streamlit run app.py
-```
-
-### It says “I could not find an answer” for something I know is in the paper
-
-That can happen. Try asking a more specific question using the wording from the paper. Check whether the PDF text extracts correctly, then open the cited sections or inspect the relevant chunks. The offline semantic search is intentionally simple and can miss paraphrases or information hidden in tables.
-
-### A number is rejected even though I calculated it correctly
-
-The number guard looks for the number in cited passages. It may reject newly calculated numbers that do not appear in the source exactly as written. This is a known trade-off documented by the project.
-
-### Do I need an API key?
-
-No—not for the default offline setup. You only need an Anthropic API key if you choose to use the optional Claude answerer. Remember that hosted API use may incur charges.
-
-## Who might find this useful?
-
-- **Students:** get oriented in a paper before reading it closely.
-- **Researchers:** locate claims and relevant passages more quickly.
-- **Engineers:** search for implementation details, parameters, and reported results.
-- **Writers and reviewers:** trace statements back to the source before repeating them.
-- **Anyone learning AI:** explore PDF parsing, retrieval, citations, refusal checks, and evaluation in one project.
-
-## Ideas for future improvements
-
-The original project notes point to several sensible next steps:
-
-- Test against more real papers and a larger, better-balanced question set.
-- Include unanswerable questions that are *related to the topic*, not only questions about entirely unrelated topics.
-- Evaluate the optional neural embedder and Claude answerer on the same set, then publish the results honestly.
-- Improve semantic retrieval for paraphrases.
-- Improve extraction for tables, equations, and multi-column layouts.
-- Use more careful evaluation, such as human review, instead of relying only on exact-string checks.
-- Make citation spans more precise and easier to inspect in the PDF.
-
-## License
-
-The original README specifies the **MIT License**. Include the project's `LICENSE` file in the repository so the terms are available to users.
+The documented default writes a Markdown report and JSON results under `results/`. For alternate backends, see the previous section.
 
 ---
 
-<p align="center">
-  <strong>Same paper. Different you.</strong><br>
-  Less hunting through pages. More checking the evidence. More time building.
-</p>
+## 8. Real-use screenshots: what belongs here 📸
+
+A README looks much better when readers can see the actual app. But there is an important difference between a **diagram** and a **real screenshot**: a diagram explains the design; a screenshot proves what the running application looked like.
+
+The complete source tree is now in this repository, including `app.py` and the `paperqa/` package. However, this README-and-assets update does **not** include genuine screenshots captured from a running Streamlit session. The diagrams in `assets/` explain the workflow; they are not screenshots of the live app. No illustration is labelled as a real screenshot.
+
+After running the application locally, capture these three real screens and save them in `assets/screenshots/`:
+
+| Screenshot filename | What the real screen should show | Suggested caption |
+|---|---|---|
+| `01-upload-paper.png` | The running Streamlit app with the sample PDF loaded or selected. | “Load a text-based research paper.” |
+| `02-cited-answer.png` | The app answering the adapter-layer question, with the `[S1]` citation visible. | “An answer with a section, page, and supporting evidence.” |
+| `03-honest-refusal.png` | The app responding to the carbon-footprint question with its refusal reason. | “When the paper does not contain the answer, the agent can abstain.” |
+
+### How to capture them on Windows
+
+1. Start the app with `streamlit run app.py`.
+2. Open the local URL printed in the terminal.
+3. Load the sample PDF through the app.
+4. Run the example question from **Mission A** and wait for the full answer and citation to appear.
+5. Press **Win + Shift + S**, select the app area, and save the image as `02-cited-answer.png` inside `assets/screenshots/`.
+6. Ask the carbon-footprint question from **Mission B** and capture the refusal as `03-honest-refusal.png`.
+7. Capture the initial upload state as `01-upload-paper.png`.
+8. Add the three images to GitHub along with this README.
+
+### How to capture them on macOS
+
+Use **Shift + Command + 4** to select the app area, then save the image files using the same names and folder structure.
+
+The image filenames and capture checklist are documented in [`assets/screenshots/README.md`](assets/screenshots/README.md). Once captured, embed them using these paths:
+
+```markdown
+![Paper loaded in the real Streamlit app](assets/screenshots/01-upload-paper.png)
+
+![Cited answer in the real Streamlit app](assets/screenshots/02-cited-answer.png)
+
+![Honest refusal in the real Streamlit app](assets/screenshots/03-honest-refusal.png)
+```
+
+**Screenshot privacy check:** close unrelated tabs, hide personal information, and make sure no API keys or other secrets are visible before committing screenshots.
+
+---
+
+## 9. Project structure 🧱
+
+The repository is organized into small modules so each part has one main job:
+
+```text
+paper-qa-agent/
+├── app.py                       # Streamlit interface
+├── paperqa/
+│   ├── ingest.py                 # PDF extraction, cleaning, sections, chunks
+│   ├── index.py                  # BM25, embedders, hybrid retrieval, RRF
+│   ├── llm.py                    # Anthropic and extractive answerers
+│   ├── agent.py                  # Retrieval, verification, answers/refusals
+│   ├── evaluate.py               # Evaluation metrics and reports
+│   ├── cli.py                    # Command-line commands
+│   ├── text.py                   # Text helpers
+│   └── config.py                 # Configuration
+├── data/
+│   └── sample_paper.pdf          # Synthetic sample paper
+├── eval/
+│   └── eval_set.json             # 29-question evaluation set
+├── tests/                        # 31 tests, according to supplied README
+├── results/                      # Evaluation report and JSON output
+├── docs/
+│   └── demo.md                   # CLI transcript
+├── scripts/
+│   ├── make_sample_paper.py      # Sample PDF generator
+│   └── make_demo.sh              # Demo transcript generator
+├── LEARNINGS.md                 # Lessons and future improvements
+└── pyproject.toml                # Package and dependency configuration
+```
+
+---
+
+## 10. Known limitations — read this before trusting the sidekick ⚠️
+
+- **Text-based PDFs only.** There is no OCR path for scanned, image-only PDFs.
+- **Complex layouts can be messy.** Two-column text, equations, and tables may extract imperfectly. Tables can flatten into rows of cells.
+- **One document at a time.** The described system does not perform cross-paper retrieval.
+- **Citation granularity.** Citations identify a chunk, section, and page; they do not point to exact character offsets in the original PDF.
+- **The evaluation is narrow.** The supplied benchmark uses one synthetic paper and 29 questions.
+- **String-based answer scoring.** The evaluation's `must_include` check can mark a correct paraphrase as wrong; human review or an LLM judge could be more faithful.
+- **The number guard is strict.** It may reject a legitimate answer that calculates a new number not literally present in the cited text.
+- **Offline LSA is a baseline.** It is not the same as a pretrained neural embedding model.
+
+Use it as a research aid, not as an authority. Verify important claims against the original paper before citing them in coursework, reports, or publications.
+
+---
+
+## 11. Troubleshooting dojo 🧯
+
+### `python` or `py` is not recognised
+
+Python may not be installed or may not be on your PATH. Install a supported Python version, reopen the terminal, and check `py --version` (Windows) or `python3 --version` (macOS/Linux).
+
+### `No module named paperqa`
+
+You may be outside the project root, or the editable install may not have completed. Change into the folder containing `pyproject.toml`, activate `.venv`, and run:
+
+```bash
+pip install -e ".[dev,ui]"
+```
+
+### `streamlit` is not recognised
+
+Make sure the virtual environment is active and that you installed the UI extra:
+
+```bash
+pip install -e ".[dev,ui]"
+```
+
+### PowerShell refuses to activate the virtual environment
+
+Use the Command Prompt activation command shown in Step 2, or follow your organisation's approved PowerShell execution-policy guidance. Do not change machine-wide security settings just to run this project.
+
+### The PDF gives poor answers
+
+Check that text can be selected and copied from the PDF. Scanned PDFs are outside the documented support. Complex tables and multi-column layouts can also produce imperfect extraction. Inspect the source passage behind the citation before trusting the answer.
+
+---
+
+## 12. Suggested learning path — level up one panel at a time 🌱
+
+1. **Run the baseline.** Install the project, run the tests, ask the two sample questions.
+2. **Inspect the evidence.** Use the cited section and page to compare the agent's answer with the paper.
+3. **Explore retrieval.** Run the evaluation with BM25, dense, and hybrid settings if the checked-out version exposes the corresponding options.
+4. **Try the optional embedder.** Compare the `st` evaluation with the offline LSA baseline.
+5. **Try the optional answerer.** Configure Anthropic and run a separate evaluation. Keep the offline results as a comparison, not as a substitute.
+6. **Improve the evaluation set.** Add difficult questions, especially questions about a topic that appears in the paper but whose exact answer is absent.
+
+The most valuable improvement suggested by the supplied results is a stronger evaluation design for **in-topic but unanswerable questions**. The project README notes that this weakness was not represented in the development split, so threshold tuning on that split did not reveal it.
+
+---
+
+## 13. FAQ 💬
+
+**Do I need an API key to try it?**  
+No. The documented offline baseline uses LSA embeddings and an extractive answerer. The Anthropic answerer is optional and requires `ANTHROPIC_API_KEY`.
+
+**Can I upload any PDF?**  
+Use a text-based PDF. Scanned image-only PDFs are not supported by the documented extraction pipeline, and complex layouts may extract imperfectly.
+
+**Does it always answer?**  
+No. Refusal is an intentional behaviour when evidence is missing or fails validation.
+
+**Can I ask questions across several papers at once?**  
+Not in the described version. It is a single-document Q&A system.
+
+**Are the reported accuracy numbers a benchmark of real academic papers?**  
+No. The supplied README reports 29 questions on one synthetic paper. Treat those numbers as a small baseline evaluation.
+
+**Can I trust every cited answer?**  
+No system check replaces reading the source. Use the citation to inspect the original passage and verify that it supports the claim.
+
+---
+
+## 14. Credits, license, and final words 🏁
+
+The repository includes an MIT `LICENSE` file. Read it before redistributing or adapting the project.
+
+One last rule from the Research Guild:
+
+> **A confident answer is not the same thing as a supported answer. Follow the citation. Check the evidence. Then decide.**
+
+Got a paper? Bring it to the arena. 📚
