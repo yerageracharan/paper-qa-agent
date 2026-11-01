@@ -45,3 +45,17 @@ def test_ordinary_paraphrase_question_is_not_blocked():
         "How much does the method help when very little labeled data is available?",
         paper,
     ) is None
+
+
+def test_missing_camel_case_technical_name_is_detected():
+    paper = "The paper discusses low-rank matrices and adapter tuning."
+    assert find_missing_question_anchor(
+        "What macro-F1 does LoRA achieve on FoodReviews?", paper
+    ) == "missing_acronym:LoRA"
+
+
+def test_camel_case_dataset_name_present_in_paper_is_allowed():
+    paper = "The experiments use FoodReviews and ForumToxicity."
+    assert find_missing_question_anchor(
+        "Which results are reported for FoodReviews?", paper
+    ) is None
