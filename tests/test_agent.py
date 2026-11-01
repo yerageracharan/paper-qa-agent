@@ -86,3 +86,43 @@ def test_query_rewrite_is_attempted_when_coverage_is_low(chunks):
 def test_answer_serialises(agent):
     d = agent.ask("What bottleneck dimension do the adapters use?").to_dict()
     assert d["found"] is True and d["retrieved"] and "section" in d["citations"][0]
+
+
+def test_strict_question_anchor_guard_rejects_unreported_dataset(chunks):
+    from paperqa.agent import PaperQAAgent
+    from paperqa.config import Config
+
+    ag = PaperQAAgent(chunks, Config(llm="extractive", strict_question_anchors=True))
+    answer = ag.ask("What accuracy does SGA reach on the MNLI dataset?")
+    assert not answer.found
+    assert answer.reason == "missing_question_anchor"
+    assert answer.citations == []
+
+
+def test_strict_question_anchor_guard_rejects_unmentioned_human_evaluation(chunks):
+    from paperqa.agent import PaperQAAgent
+    from paperqa.config import Config
+
+    ag = PaperQAAgent(chunks, Config(llm="extractive", strict_question_anchors=True))
+    answer = ag.ask("Did the authors run a human evaluation?")
+    assert not answer.found
+    assert answer.reason == "missing_question_anchor"
+
+
+def test_strict_question_anchor_guard_preserves_answerable_acronym_question(chunks):
+    from paperqa.agent import PaperQAAgent
+    from paperqa.config import Config
+
+    ag = PaperQAAgent(chunks, Config(llm="extractive", strict_question_anchors=True))
+    answer = ag.ask("What average macro-F1 does SGA achieve?")
+    assert answer.reason != "missing_question_anchor"
+    assert answer.found
+
+
+def test_strict_question_anchor_guard_does_not_block_paraphrase(chunks):
+    from paperqa.agent import PaperQAAgent
+    from paperqa.config import Config
+
+    ag = PaperQAAgent(chunks, Config(llm="extractive", strict_question_anchors=True))
+    answer = ag.ask("How much does the method help when very little labeled data is available?")
+    assert answer.reason != "missing_question_anchor"
