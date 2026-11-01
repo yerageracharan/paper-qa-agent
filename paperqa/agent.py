@@ -111,7 +111,7 @@ class PaperQAAgent:
         # Optional conservative guard: reject highly specific question anchors absent from the full paper.
         # This is a lexical presence check, not a semantic entailment model, so it remains opt-in.
         if self.config.strict_question_anchors:
-            paper_text = "\\n".join(chunk.text for chunk in self.chunks)
+            paper_text = "\n".join(chunk.text for chunk in self.chunks)
             missing_anchor = find_missing_question_anchor(question, paper_text)
             if missing_anchor:
                 return self._abstain(question, "missing_question_anchor", hits, cov, t0, rewritten)
