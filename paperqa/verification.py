@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 
-_ACRONYM_RE = re.compile(r"\b[A-Z][A-Z0-9-]{1,}\b")
+ACRONYM_RE = re.compile(r"\b(?:[A-Z][A-Z0-9-]{1,}|[A-Z][a-z]+[A-Z][A-Za-z0-9]*)\b")
 _HUMAN_EVALUATION_QUESTION_RE = re.compile(
     r"\bhuman\s+(?:evaluation|study|assessment|testing)\b", re.IGNORECASE
 )
