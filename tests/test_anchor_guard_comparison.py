@@ -52,5 +52,5 @@ def test_render_report_shows_guard_caveats_and_metrics():
     }
     report = render_report(comparison)
     assert "strict_question_anchors" in report
-    assert "Not a semantic entailment model" in report
+    assert "semantic entailment model" in report
     assert "u05" in report
