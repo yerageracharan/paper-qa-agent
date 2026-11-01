@@ -276,6 +276,21 @@ python -m paperqa ask data/sample_paper.pdf "What method do the authors use?" --
 
 The configured model is `sentence-transformers/all-MiniLM-L6-v2`. The first run may download model files, so internet access is needed then. This path has not been benchmarked in the supplied evaluation results.
 
+#### Compare LSA with Sentence Transformers
+
+The repository now includes a controlled comparison runner. It evaluates both embedding backends against the same PDF and 29-question evaluation set while keeping the extractive answerer, top-k value, and scoring rules fixed.
+
+Install the optional neural-embedding dependency and run:
+
+~~~powershell
+python -m pip install -e ".[dev,embeddings]"
+python scripts/evaluate_backends.py --pdf data/sample_paper.pdf --eval-set eval/eval_set.json --llm extractive --top-k 5 --out results/backend-comparison
+~~~
+
+The script writes a side-by-side Markdown report and JSON file, plus each backend's full evaluation output. The first use of the st backend downloads the public model. This requires internet access but no Anthropic API key. The GitHub Actions workflow named **Compare Paper Q&A embedding backends** runs the same comparison and uploads its reports as a downloadable artifact.
+
+The answerer is deliberately fixed to the offline extractive mode for this experiment. The experiment isolates the effect of changing embeddings; it does not measure Claude or API cost. The workflow's first result must be inspected before making any performance claim.
+
 ### Option C — Use Anthropic as the answerer
 
 Install the optional dependency:
