@@ -11,10 +11,22 @@
 
 ## What I would improve next (in priority order)
 
-1. **Measure the real backends.** Run the two commands in the README with `--embedder st` and `--llm anthropic` and add the comparison table. This is the single most valuable next step, and the harness already supports it.
+1. **Measure the real backends.** A no-key comparison runner now evaluates LSA and Sentence Transformers with the same extractive answerer, sample PDF and evaluation set. The GitHub Actions workflow has been added and the first run's artifact still needs to be inspected. Anthropic remains a separate optional experiment because it requires an API key and may incur cost.
 2. **Fix the in-topic abstention weakness.** Add an entailment/verification pass (an LLM call or a small NLI model) that checks "does this passage actually state the answer?" before returning, and measure abstain recall on a bigger set of in-topic unanswerable questions.
 3. **A larger, real eval set.** 5 to 10 open-access papers with 20+ questions each, written by someone other than the author of the pipeline, with a held-out test split that is read once.
 4. **Better document parsing.** Two-column layout handling and table extraction (for example `pdfplumber`), so table cells keep their row and column context instead of becoming a flat string.
 5. **Reranking.** A cross-encoder reranker over the top 20 hybrid results; measure the hit@1 gain against its latency.
 6. **Sharper citations.** Highlight the quoted span in the PDF page, and validate each sentence of the answer against its own cited sentence rather than the union of cited chunks.
 7. **Cost and latency tracking** in the eval report (tokens, dollars, p95) once an LLM backend is evaluated.
+
+
+## Latest implementation update
+
+The controlled backend experiment is now reproducible with:
+
+~~~powershell
+python -m pip install -e ".[dev,embeddings]"
+python scripts/evaluate_backends.py --pdf data/sample_paper.pdf --eval-set eval/eval_set.json --llm extractive --top-k 5 --out results/backend-comparison
+~~~
+
+It writes one evaluation directory per embedder plus a combined Markdown and JSON comparison. A GitHub Actions workflow installs the optional Sentence Transformers dependency, runs the full test suite, performs both comparisons, and uploads the reports. This run uses a public model and the offline extractive answerer; it does not require a paid API key. The workflow result is pending inspection.
