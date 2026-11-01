@@ -106,7 +106,8 @@ def render_report(comparison: dict[str, Any]) -> str:
     lines += ["", "### Newly answered questions", "",
               "| ID | Type | Question |", "|---|---|---|"]
     for item in changes["newly_answered"]:
-        lines.append(f"| {item['id']} | {item['type']} | {item['question'].replace('|', '\\|')} |")
+        question = item['question'].replace('|', '\\|')
+        lines.append(f"| {item['id']} | {item['type']} | {question} |")
 
     lines += [
         "",
