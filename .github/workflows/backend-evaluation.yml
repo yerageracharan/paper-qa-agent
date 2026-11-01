@@ -1,0 +1,61 @@
+name: Compare Paper Q&A embedding backends
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/backend-evaluation.yml"
+      - "paperqa/**"
+      - "scripts/evaluate_backends.py"
+      - "tests/test_backend_comparison.py"
+      - "eval/eval_set.json"
+      - "data/sample_paper.pdf"
+      - "pyproject.toml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: paperqa-backend-evaluation
+  cancel-in-progress: false
+
+jobs:
+  compare:
+    name: Compare LSA and Sentence Transformers
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install offline, test, and neural-embedding dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,embeddings]"
+
+      - name: Run the complete test suite
+        run: python -m pytest -q
+
+      - name: Compare both embedding backends with the same extractive answerer
+        run: |
+          python scripts/evaluate_backends.py \
+            --pdf data/sample_paper.pdf \
+            --eval-set eval/eval_set.json \
+            --llm extractive \
+            --top-k 5 \
+            --out results/backend-comparison
+
+      - name: Upload evaluation reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: paperqa-backend-comparison
+          path: results/backend-comparison/
+          if-no-files-found: error
+          retention-days: 30
