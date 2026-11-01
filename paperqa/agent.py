@@ -11,6 +11,7 @@ from .index import HybridIndex, Hit
 from .ingest import Chunk, load_pdf
 from .llm import LLM, NOT_FOUND, build_llm
 from .text import QSTOP, split_sentences, tokenize
+from .verification import find_missing_question_anchor
 
 _CITE_RE = re.compile(r"\[S(\d+)\]")
 _NUM_RE = re.compile(r"\d+(?:\.\d+)?")
@@ -21,6 +22,7 @@ ABSTAIN_REASONS = {
     "model_not_found": "The answerer found nothing in the retrieved passages that answers the question.",
     "no_valid_citation": "The answer had no valid citation, so it was rejected.",
     "unsupported_number": "The answer contained a number that does not appear in the cited passages.",
+    "missing_question_anchor": "A specific entity or evaluation procedure named in the question is not mentioned in the paper.",
 }
 
 
@@ -105,6 +107,14 @@ class PaperQAAgent:
         hits = self.index.search(question)
         cov = self.coverage(question, hits)
         rewritten = None
+
+        # Optional conservative guard: reject highly specific question anchors absent from the full paper.
+        # This is a lexical presence check, not a semantic entailment model, so it remains opt-in.
+        if self.config.strict_question_anchors:
+            paper_text = "\\n".join(chunk.text for chunk in self.chunks)
+            missing_anchor = find_missing_question_anchor(question, paper_text)
+            if missing_anchor:
+                return self._abstain(question, "missing_question_anchor", hits, cov, t0, rewritten)
 
         # Agentic step: if the first retrieval looks weak and the LLM can paraphrase, try one rewritten query.
         if cov < self.config.min_coverage and self.config.allow_query_rewrite and self.llm.supports_rewrite:
