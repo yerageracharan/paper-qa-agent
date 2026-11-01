@@ -21,6 +21,7 @@ class Config:
     # --- abstention ---
     min_coverage: float = 0.3       # idf-weighted share of question terms found in retrieved text
     sentence_coverage: float = 0.3  # same, but required inside the single best answer sentence (offline answerer)
+    strict_question_anchors: bool = False  # experimental, opt-in checks for explicit acronyms/procedures
 
     # --- LLM ---
     llm: str = "auto"               # "auto" | "anthropic" | "extractive"
