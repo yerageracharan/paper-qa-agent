@@ -254,6 +254,8 @@ Refusal reasons used by the project include `low_coverage`, `model_not_found`, `
 
 **Important:** these checks reduce certain failure modes. They do not prove that every answer is correct. Check the cited passage yourself.
 
+An experimental, opt-in question-anchor guard is also available. It checks for missing high-specificity acronyms and explicit human-evaluation evidence before generating an answer. It remains disabled by default because it is a narrow lexical rule, not a general entailment model. See [the guard experiment report](docs/ANCHOR_GUARD_EXPERIMENT.md).
+
 ## 6. Optional power-ups: use real models
 
 ### Option A — Keep the offline baseline
