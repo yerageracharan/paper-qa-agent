@@ -276,6 +276,8 @@ python -m paperqa ask data/sample_paper.pdf "What method do the authors use?" --
 
 The configured model is `sentence-transformers/all-MiniLM-L6-v2`. The first run may download model files, so internet access is needed then. This path has not been benchmarked in the supplied evaluation results.
 
+**Measured comparison (November 2026):** the repository now includes a controlled LSA-versus-Sentence-Transformers experiment. On the current 29-question synthetic-paper evaluation, Sentence Transformers did not improve end-to-end answer accuracy or abstention. Its standalone dense retrieval was weaker than LSA; its hybrid retrieval improved Hit@3 slightly but lowered Hit@1 and MRR. The detailed report is in [docs/BACKEND_COMPARISON.md](docs/BACKEND_COMPARISON.md). Do not change the default embedder based on this small sample.
+
 #### Compare LSA with Sentence Transformers
 
 The repository now includes a controlled comparison runner. It evaluates both embedding backends against the same PDF and 29-question evaluation set while keeping the extractive answerer, top-k value, and scoring rules fixed.
