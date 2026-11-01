@@ -48,7 +48,7 @@ def test_ordinary_paraphrase_question_is_not_blocked():
 
 
 def test_missing_camel_case_technical_name_is_detected():
-    paper = "The paper discusses low-rank matrices and adapter tuning."
+    paper = "The paper reports macro-F1 and discusses low-rank matrices and adapter tuning."
     assert find_missing_question_anchor(
         "What macro-F1 does LoRA achieve on FoodReviews?", paper
     ) == "missing_acronym:LoRA"
