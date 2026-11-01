@@ -1,0 +1,62 @@
+name: Evaluate Paper Q&A question-anchor guard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/anchor-guard-evaluation.yml"
+      - "paperqa/**"
+      - "scripts/evaluate_anchor_guard.py"
+      - "tests/test_verification.py"
+      - "tests/test_agent.py"
+      - "tests/test_anchor_guard_comparison.py"
+      - "eval/eval_set.json"
+      - "data/sample_paper.pdf"
+      - "pyproject.toml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: paperqa-anchor-guard
+  cancel-in-progress: false
+
+jobs:
+  evaluate:
+    name: Baseline versus opt-in question-anchor guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install project and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Run complete test suite
+        run: python -m pytest -q
+
+      - name: Compare baseline and guarded behaviour
+        run: |
+          python scripts/evaluate_anchor_guard.py \
+            --pdf data/sample_paper.pdf \
+            --eval-set eval/eval_set.json \
+            --top-k 5 \
+            --out results/anchor-guard
+
+      - name: Upload anchor-guard evaluation
+        uses: actions/upload-artifact@v4
+        with:
+          name: paperqa-anchor-guard
+          path: results/anchor-guard/
+          if-no-files-found: error
+          retention-days: 30
