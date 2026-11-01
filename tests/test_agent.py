@@ -126,3 +126,13 @@ def test_strict_question_anchor_guard_does_not_block_paraphrase(chunks):
     ag = PaperQAAgent(chunks, Config(llm="extractive", strict_question_anchors=True))
     answer = ag.ask("How much does the method help when very little labeled data is available?")
     assert answer.reason != "missing_question_anchor"
+
+
+def test_strict_question_anchor_guard_rejects_unreported_lora_result(chunks):
+    from paperqa.agent import PaperQAAgent
+    from paperqa.config import Config
+
+    ag = PaperQAAgent(chunks, Config(llm="extractive", strict_question_anchors=True))
+    answer = ag.ask("What macro-F1 does LoRA achieve on FoodReviews?")
+    assert not answer.found
+    assert answer.reason == "missing_question_anchor"
