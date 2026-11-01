@@ -36,7 +36,8 @@ def find_missing_question_anchor(question: str, paper_text: str) -> str | None:
     """
     corpus_upper = paper_text.upper()
     for acronym in dict.fromkeys(_ACRONYM_RE.findall(question)):
-        if not re.search(rf"\b{re.escape(acronym)}\b", corpus_upper):
+        normalized_anchor = acronym.upper()
+        if not re.search(rf"\b{re.escape(normalized_anchor)}\b", corpus_upper):
             return f"missing_acronym:{acronym}"
 
     if _HUMAN_EVALUATION_QUESTION_RE.search(question):
