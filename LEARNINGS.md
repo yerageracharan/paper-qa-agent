@@ -11,7 +11,7 @@
 
 ## What I would improve next (in priority order)
 
-1. **Measure the real backends.** A no-key comparison runner now evaluates LSA and Sentence Transformers with the same extractive answerer, sample PDF and evaluation set. The GitHub Actions workflow has been added and the first run's artifact still needs to be inspected. Anthropic remains a separate optional experiment because it requires an API key and may incur cost.
+1. **Measure the real backends.** Completed. A no-key comparison runner evaluated LSA and Sentence Transformers with the same extractive answerer, sample PDF and evaluation set. GitHub Actions run 41358948059 passed the complete test suite, both evaluations, and artifact upload. On this 29-question synthetic-paper set, Sentence Transformers did not improve end-to-end answer metrics; its dense retrieval was weaker, its hybrid ranking trade-off was mixed, and its measured latency was higher. See docs/BACKEND_COMPARISON.md. Anthropic remains a separate optional experiment because it requires an API key and may incur cost.
 2. **Fix the in-topic abstention weakness.** Add an entailment/verification pass (an LLM call or a small NLI model) that checks "does this passage actually state the answer?" before returning, and measure abstain recall on a bigger set of in-topic unanswerable questions.
 3. **A larger, real eval set.** 5 to 10 open-access papers with 20+ questions each, written by someone other than the author of the pipeline, with a held-out test split that is read once.
 4. **Better document parsing.** Two-column layout handling and table extraction (for example `pdfplumber`), so table cells keep their row and column context instead of becoming a flat string.
