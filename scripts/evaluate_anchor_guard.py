@@ -114,7 +114,7 @@ def render_report(comparison: dict[str, Any]) -> str:
         "## Interpretation and limitations",
         "",
         "- This is a narrow lexical safeguard, not a semantic entailment model.",
-        "- It checks all-caps technical acronyms in a question and requires recognised human-study evidence for explicit human-evaluation questions.",
+        "- It checks all-caps acronyms and technical CamelCase names (such as LoRA) in a question, and requires recognised human-study evidence for explicit human-evaluation questions.",
         "- The rule may refuse an answer if a paper uses a full form without the acronym or describes a study using a synonym not yet included. It therefore remains opt-in.",
         "- The evaluation is one synthetic paper and 29 questions, not a real-world research-paper benchmark.",
         "- Compare answerable-question accuracy and false-abstain rate as well as abstention recall. A guard that refuses everything would have high refusal recall but would be useless.",
