@@ -25,8 +25,8 @@ _HUMAN_EVALUATION_EVIDENCE_RE = re.compile(
 def find_missing_question_anchor(question: str, paper_text: str) -> str | None:
     """Return a missing anchor code, or None when this narrow check passes.
 
-    All-caps technical acronyms in the question must occur as whole tokens in
-    the paper. A question explicitly asking about a human evaluation/study must
+    All-caps acronyms and technical CamelCase names in the question must occur
+    as whole tokens in the paper. A question explicitly asking about a human evaluation/study must
     have human-study evidence (human evaluation/study, participants, interviews,
     surveys, a user study, or a usability study) somewhere in the paper.
 
