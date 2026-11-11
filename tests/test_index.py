@@ -44,3 +44,20 @@ def test_empty_document_is_rejected():
 def test_invalid_mode(chunks):
     with pytest.raises(ValueError):
         HybridIndex(chunks).search("x", mode="nope")
+
+
+@pytest.mark.parametrize("k", [0, -1, True, 1.5])
+def test_search_rejects_invalid_result_limits(chunks, k):
+    idx = HybridIndex(chunks, config=Config())
+    with pytest.raises(ValueError, match="k must be a positive integer"):
+        idx.search("adapter evidence", k=k)
+
+
+def test_search_uses_configured_limit_when_k_is_none(chunks):
+    idx = HybridIndex(chunks, config=Config(top_k=2))
+    assert len(idx.search("adapter evidence")) <= 2
+
+
+def test_search_returns_empty_for_blank_query(chunks):
+    idx = HybridIndex(chunks, config=Config())
+    assert idx.search("   ") == []

@@ -136,3 +136,17 @@ def test_strict_question_anchor_guard_rejects_unreported_lora_result(chunks):
     answer = ag.ask("What macro-F1 does LoRA achieve on FoodReviews?")
     assert not answer.found
     assert answer.reason == "missing_question_anchor"
+
+
+def test_empty_question_is_rejected(agent):
+    import pytest
+
+    with pytest.raises(ValueError, match="question cannot be empty"):
+        agent.ask("   ")
+
+
+def test_non_string_question_is_rejected(agent):
+    import pytest
+
+    with pytest.raises(TypeError, match="question must be a string"):
+        agent.ask(None)

@@ -138,7 +138,16 @@ class HybridIndex:
         return term in self.bm25.idf
 
     def search(self, query: str, k: int | None = None, mode: str = "hybrid") -> list[Hit]:
-        k = k or self.config.top_k
+        if k is None:
+            k = self.config.top_k
+        if isinstance(k, bool) or not isinstance(k, int) or k < 1:
+            raise ValueError("k must be a positive integer")
+        if mode not in {"bm25", "dense", "hybrid"}:
+            raise ValueError(f"unknown mode {mode!r}")
+        if not isinstance(query, str):
+            raise TypeError("query must be a string")
+        if not query.strip():
+            return []
         q_tokens = tokenize(query)
         bm = self.bm25.scores(q_tokens)
         dense = self.matrix @ self.embedder.encode([query])[0]

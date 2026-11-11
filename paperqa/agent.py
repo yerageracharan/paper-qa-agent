@@ -103,6 +103,10 @@ class PaperQAAgent:
 
     # ------------------------------------------------------------------ main entry point
     def ask(self, question: str) -> Answer:
+        if not isinstance(question, str):
+            raise TypeError("question must be a string")
+        if not question.strip():
+            raise ValueError("question cannot be empty")
         t0 = time.perf_counter()
         hits = self.index.search(question)
         cov = self.coverage(question, hits)
