@@ -9,6 +9,7 @@
 <p align="center"><strong>Your research-paper sidekick: ask a PDF a question, get an answer with a page and section to check — or get an honest “I couldn't find that.”</strong></p>
 
 <p align="center">
+  <a href="https://github.com/yerageracharan/paper-qa-agent/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/yerageracharan/paper-qa-agent/actions/workflows/ci.yml/badge.svg?branch=main" /></a>
   <img alt="Python 3.10–3.13" src="https://img.shields.io/badge/Python-3.10%E2%80%933.13-3776AB?logo=python&logoColor=white" />
   <img alt="31 tests" src="https://img.shields.io/badge/tests-31-6f42c1" />
   <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-2ea44f" />
