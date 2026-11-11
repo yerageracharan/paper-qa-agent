@@ -54,7 +54,7 @@ jobs:
             --out results/anchor-guard
 
       - name: Upload anchor-guard evaluation
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: paperqa-anchor-guard
           path: results/anchor-guard/
