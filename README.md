@@ -1,5 +1,7 @@
 # Paper Q&A Agent
 
+**[Documentation map](docs/README.md)** · [Contribution guide](CONTRIBUTING.md) · [Security policy](SECURITY.md)
+
 <p align="center">
   <img src="assets/hero.svg" alt="Manga-inspired Paper Q&A Agent banner" width="100%" />
 </p>
