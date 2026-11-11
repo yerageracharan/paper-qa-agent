@@ -489,3 +489,9 @@ Got a paper? Bring it to the arena. 📚
 ---
 
 **License:** MIT. See [`LICENSE`](LICENSE).
+
+## Contributing and project safety
+
+- [Contributing guide](CONTRIBUTING.md) — development setup, test commands, and pull-request expectations.
+- [AI coding-agent instructions](AGENTS.md) — repository-specific invariants and verification rules.
+- [Security policy](SECURITY.md) — private vulnerability disclosure and safe handling.
