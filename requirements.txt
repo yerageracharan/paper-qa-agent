@@ -1,5 +1,5 @@
 # Versions this project was built and tested with (Python 3.13). Prefer: pip install -e ".[dev,ui]"
-pypdf==6.17.0
+pypdf==7.0.0
 numpy==2.5.3
 scikit-learn==1.9.1
 reportlab==5.0.1
