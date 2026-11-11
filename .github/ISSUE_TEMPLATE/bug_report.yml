@@ -1,0 +1,55 @@
+name: Bug report
+description: Report a reproducible defect in Paper QA Agent.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: "Do not attach private papers, API keys, tokens, or unredacted environment files. Use synthetic or public paper samples."
+  - type: textarea
+    id: summary
+    attributes:
+      label: What is broken?
+      description: One concrete behavior, not multiple unrelated requests.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Include the command, sample input, and shortest repeatable steps.
+      placeholder: "1. Run ...\n2. Ask ...\n3. Observe ..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and evidence
+      description: Include the relevant error, incorrect citation, or output excerpt.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+  - type: input
+    id: python
+    attributes:
+      label: Python and operating system
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Execution mode
+      options:
+        - Offline extractive mode
+        - Hosted LLM provider
+        - Optional embedding model
+        - Streamlit UI
+        - Unsure
+    validations:
+      required: true

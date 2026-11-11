@@ -1,0 +1,29 @@
+name: Feature request
+description: Propose a focused product improvement.
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: What task is difficult or impossible today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the observable workflow or output.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and trade-offs
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Example or evaluation plan
+      description: Provide a public/synthetic paper example, expected citations, or a way to measure improvement.
+    validations:
+      required: true
