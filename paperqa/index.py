@@ -68,17 +68,32 @@ class LsaEmbedder:
         from sklearn.decomposition import TruncatedSVD
         from sklearn.feature_extraction.text import TfidfVectorizer
 
+        if not texts:
+            raise ValueError("LSA needs at least one text chunk")
         self.vectorizer = TfidfVectorizer(
             tokenizer=tokenize, lowercase=False, token_pattern=None, ngram_range=(1, 2), sublinear_tf=True
         )
-        matrix = self.vectorizer.fit_transform(texts)
-        n_comp = max(2, min(self.dims, matrix.shape[0] - 1, matrix.shape[1] - 1))
+        try:
+            matrix = self.vectorizer.fit_transform(texts)
+        except ValueError as exc:
+            raise ValueError("LSA could not build a vocabulary from the supplied text chunks") from exc
+
+        # TruncatedSVD requires more than one sample and feature. For tiny papers,
+        # use the same TF-IDF vectors directly instead of forcing an invalid rank.
+        if min(matrix.shape) < 2:
+            self.svd = None
+            return
+        n_comp = min(self.dims, matrix.shape[0] - 1, matrix.shape[1] - 1)
+        if n_comp < 1:
+            self.svd = None
+            return
         self.svd = TruncatedSVD(n_components=n_comp, random_state=0)
         self.svd.fit(matrix)
 
     def encode(self, texts: list[str]) -> np.ndarray:
-        assert self.vectorizer is not None and self.svd is not None, "call fit() first"
-        vecs = self.svd.transform(self.vectorizer.transform(texts))
+        assert self.vectorizer is not None, "call fit() first"
+        matrix = self.vectorizer.transform(texts)
+        vecs = matrix.toarray() if self.svd is None else self.svd.transform(matrix)
         norms = np.linalg.norm(vecs, axis=1, keepdims=True)
         return vecs / np.where(norms == 0, 1, norms)
 

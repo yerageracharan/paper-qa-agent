@@ -61,3 +61,41 @@ def test_search_uses_configured_limit_when_k_is_none(chunks):
 def test_search_returns_empty_for_blank_query(chunks):
     idx = HybridIndex(chunks, config=Config())
     assert idx.search("   ") == []
+
+
+def test_lsa_embedder_handles_a_single_chunk():
+    from paperqa.index import LsaEmbedder
+
+    embedder = LsaEmbedder()
+    texts = ["One short paper chunk describes adapter tuning and model compression."]
+    embedder.fit(texts)
+    vectors = embedder.encode(texts)
+    assert vectors.shape[0] == 1
+    assert np.isfinite(vectors).all()
+    assert np.linalg.norm(vectors[0]) == pytest.approx(1.0)
+
+
+def test_lsa_embedder_handles_two_chunks_with_one_feature():
+    from paperqa.index import LsaEmbedder
+
+    embedder = LsaEmbedder()
+    texts = ["adapter", "adapter"]
+    embedder.fit(texts)
+    vectors = embedder.encode(texts)
+    assert vectors.shape == (2, 1)
+    assert np.isfinite(vectors).all()
+
+
+def test_hybrid_index_can_index_a_single_chunk():
+    from paperqa.ingest import Chunk
+
+    chunk = Chunk(
+        id=0,
+        section="Abstract",
+        pages=[1],
+        text="This short research passage describes adapter tuning for neural language models.",
+    )
+    index = HybridIndex([chunk], config=Config())
+    hits = index.search("adapter tuning")
+    assert len(hits) == 1
+    assert hits[0].chunk.id == 0
